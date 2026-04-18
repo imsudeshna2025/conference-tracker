@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conference Tracker</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:1.5rem 1rem}
+  .wrap{max-width:680px;margin:0 auto}
+  input,select{width:100%;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;font-size:14px;background:#fff;outline:none}
+  input:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+  button{cursor:pointer;padding:6px 14px;border:0.5px solid #ccc;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a}
+  button:hover{background:#f0f0ee}
+  .btn-primary{background:#e6f1fb;color:#185fa5;border-color:#85b7eb;font-weight:500}
+  .btn-primary:hover{background:#d0e6f7}
+  .btn-danger{color:#a32d2d;border-color:#f09595}
+  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+  .header-left h1{font-size:20px;font-weight:500}
+  .header-left p{font-size:13px;color:#666;margin-top:3px}
+  .header-right{display:flex;gap:8px}
+  .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;display:inline-block}
+  .badge-synced{background:#eaf3de;color:#3b6d11;border:0.5px solid #97c459}
+  .badge-saving{background:#faeeda;color:#854f0b;border:0.5px solid #ef9f27}
+  .badge-error{background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
+  .badge-urgent{background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
+  .badge-upcoming{background:#e6f1fb;color:#185fa5;border:0.5px solid #85b7eb}
+  .badge-future{background:#eaf3de;color:#3b6d11;border:0.5px solid #97c459}
+  .badge-passed{background:#f1efe8;color:#5f5e5a;border:0.5px solid #d3d1c7}
+  .badge-today{background:#faeeda;color:#854f0b;border:0.5px solid #ef9f27}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+  .stat{border-radius:8px;padding:10px 14px}
+  .stat label{font-size:12px;display:block;margin-bottom:4px}
+  .stat span{font-size:22px;font-weight:500;display:block}
+  .filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+  .filters button{font-size:12px;padding:4px 12px}
+  .filters button.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+  .card{background:#fff;border:0.5px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:12px}
+  .card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+  .card-header:hover{background:#fafaf8}
+  .card-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card-title strong{font-size:15px;font-weight:500}
+  .card-loc{font-size:13px;color:#666;margin-top:2px}
+  .card-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+  .card-actions a{font-size:12px;color:#185fa5;text-decoration:none;padding:3px 8px;border:0.5px solid #85b7eb;border-radius:6px}
+  .card-body{border-top:0.5px solid #eee;padding:12px 16px;display:none}
+  .card-body.open{display:grid;gap:8px}
+  .deadline-row{display:flex;align-items:center;gap:10px}
+  .deadline-label{font-size:13px;color:#666;width:155px;flex-shrink:0}
+  .deadline-date{font-size:13px;font-weight:500;flex:1}
+  .empty{text-align:center;padding:3rem 1rem;color:#888}
+  .empty .icon{font-size:32px;margin-bottom:12px}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;z-index:100}
+  .modal-overlay.open{display:flex}
+  .modal{background:#fff;border-radius:16px;border:0.5px solid #ddd;padding:1.5rem;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
+  .modal h2{font-size:17px;font-weight:500;margin-bottom:1rem}
+  .field-group{display:grid;gap:10px;margin-bottom:16px}
+  .dl-group{display:grid;gap:8px;margin-bottom:20px}
+  .dl-row{display:flex;align-items:center;gap:10px}
+  .dl-row label{font-size:13px;color:#666;width:150px;flex-shrink:0}
+  .dl-row input{flex:1;width:auto}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end}
+  .error-box{padding:12px 16px;border-radius:8px;background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595;font-size:13px;margin-bottom:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-left">
+      <h1>Conference tracker</h1>
+      <p><span id="conf-count">0</span> conferences tracked &nbsp;<span id="sync-badge" class="badge badge-synced">● Synced</span></p>
+    </div>
+    <div class="header-right">
+      <button onclick="loadData()">↻ Refresh</button>
+      <button class="btn-primary" onclick="openModal()">+ Add conference</button>
+    </div>
+  </div>
+
+  <div id="error-box" class="error-box" style="display:none"></div>
+  <div id="stats" class="stats" style="display:none">
+    <div class="stat" style="background:#f0f0ee"><label style="color:#666">Total</label><span id="s-total">0</span></div>
+    <div class="stat" style="background:#e6f1fb"><label style="color:#185fa5">Active</label><span id="s-active" style="color:#185fa5">0</span></div>
+    <div class="stat" id="s-urgent-card" style="background:#f0f0ee"><label id="s-urgent-label" style="color:#666">Urgent (≤7d)</label><span id="s-urgent" style="color:#666">0</span></div>
+  </div>
+
+  <div class="filters" id="filters" style="display:none">
+    <button class="active" onclick="setFilter('all',this)">All</button>
+    <button onclick="setFilter('active',this)">Active</button>
+    <button onclick="setFilter('urgent',this)">Urgent</button>
+    <button onclick="setFilter('passed',this)">Passed</button>
+  </div>
+
+  <div id="conf-list"></div>
+  <div id="empty" class="empty" style="display:none">
+    <div class="icon">📋</div>
+    <div style="font-weight:500;margin-bottom:6px">No conferences yet</div>
+    <div style="font-size:14px">Add your first conference to start tracking deadlines.</div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <h2 id="modal-title">Add conference</h2>
+    <div class="field-group">
+      <input id="f-name" type="text" placeholder="Conference name"/>
+      <input id="f-location" type="text" placeholder="Location (city, country)"/>
+      <input id="f-website" type="url" placeholder="Website URL"/>
+    </div>
+    <p style="font-size:13px;color:#666;margin-bottom:8px">Deadlines</p>
+    <div class="dl-group" id="dl-fields"></div>
+    <div class="modal-footer">
+      <button onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveConf()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FB = "https://conference-tracker-be3b6-default-rtdb.asia-southeast1.firebasedatabase.app";
+const DL = [
+  {key:"abstract",label:"Abstract Due"},
+  {key:"submission",label:"Paper Submission"},
+  {key:"rebuttal",label:"Rebuttal"},
+  {key:"notification",label:"Decision Notification"},
+  {key:"camera",label:"Camera-Ready"},
+  {key:"conference",label:"Conference"},
+];
+
+let confs = [], editingId = null, currentFilter = "all";
+
+// Build deadline fields in modal
+const dlGroup = document.getElementById("dl-fields");
+DL.forEach(({key,label}) => {
+  dlGroup.innerHTML += `<div class="dl-row"><label>${label}</label><input type="date" id="f-${key}"/></div>`;
+});
+
+function getDays(d) {
+  if (!d) return null;
+  const t = new Date(); t.setHours(0,0,0,0);
+  const x = new Date(d); x.setHours(0,0,0,0);
+  return Math.round((x-t)/86400000);
+}
+function getStatus(d) {
+  if (d===null) return null;
+  if (d<0) return "passed";
+  if (d===0) return "today";
+  if (d<=7) return "urgent";
+  if (d<=30) return "upcoming";
+  return "future";
+}
+function fmtDate(s) {
+  if (!s) return "";
+  return new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
+}
+function getNext(c) {
+  let m = null;
+  DL.forEach(({key}) => { const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m))m=d; });
+  return m;
+}
+function badgeHtml(days) {
+  if (days===null) return "";
+  const s = getStatus(days);
+  const label = days<0?`${Math.abs(days)}d ago`:days===0?"Today":`${days}d left`;
+  return `<span class="badge badge-${s}">${label}</span>`;
+}
+
+function setSyncStatus(s) {
+  const el = document.getElementById("sync-badge");
+  el.className = "badge " + (s==="synced"?"badge-synced":s==="saving"?"badge-saving":"badge-error");
+  el.textContent = s==="synced"?"● Synced":s==="saving"?"Syncing...":"Sync error";
+}
+
+async function loadData() {
+  setSyncStatus("saving");
+  try {
+    const r = await fetch(`${FB}/conferences.json`);
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    confs = data && typeof data==="object" ? Object.values(data) : [];
+    setSyncStatus("synced");
+    document.getElementById("error-box").style.display="none";
+    render();
+  } catch(e) {
+    setSyncStatus("error");
+    document.getElementById("error-box").style.display="block";
+    document.getElementById("error-box").textContent = "Could not connect to Firebase: "+e.message;
+  }
+}
+
+async function pushData() {
+  setSyncStatus("saving");
+  try {
+    const obj = {};
+    confs.forEach(c => { obj[c.id]=c; });
+    const r = await fetch(`${FB}/conferences.json`, {
+      method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(obj)
+    });
+    if (!r.ok) throw new Error(r.status);
+    setSyncStatus("synced");
+  } catch(e) {
+    setSyncStatus("error");
+  }
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  render();
+}
+
+function render() {
+  const sorted = [...confs].sort((a,b) => {
+    const na=getNext(a),nb=getNext(b);
+    if(na===null&&nb===null)return 0;
+    if(na===null)return 1; if(nb===null)return -1;
+    return na-nb;
+  });
+  const filtered = currentFilter==="all" ? sorted : sorted.filter(c => {
+    const nd=getNext(c);
+    if(currentFilter==="active") return nd!==null&&nd>=0;
+    if(currentFilter==="urgent") return nd!==null&&nd>=0&&nd<=7;
+    if(currentFilter==="passed") return nd===null||nd<0;
+    return true;
+  });
+
+  document.getElementById("conf-count").textContent = confs.length;
+
+  const urgent = confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0&&d<=7;}).length;
+  const active = confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0;}).length;
+
+  const statsEl = document.getElementById("stats");
+  statsEl.style.display = confs.length>0?"grid":"none";
+  document.getElementById("s-total").textContent = confs.length;
+  document.getElementById("s-active").textContent = active;
+  document.getElementById("s-urgent").textContent = urgent;
+  const uc = document.getElementById("s-urgent-card");
+  uc.style.background = urgent>0?"#fcebeb":"#f0f0ee";
+  document.getElementById("s-urgent").style.color = urgent>0?"#a32d2d":"#666";
+  document.getElementById("s-urgent-label").style.color = urgent>0?"#a32d2d":"#666";
+
+  document.getElementById("filters").style.display = confs.length>1?"flex":"none";
+
+  const list = document.getElementById("conf-list");
+  list.innerHTML = "";
+  document.getElementById("empty").style.display = filtered.length===0&&confs.length===0?"block":"none";
+
+  filtered.forEach(conf => {
+    const nd = getNext(conf);
+    const sc = {passed:"#f1efe8",today:"#faeeda",urgent:"#fcebeb",upcoming:"#e6f1fb",future:"#eaf3de"}[nd!==null?getStatus(nd):"future"];
+    const st = nd===null?"":nd===0?"Deadline today":nd<0?"All passed":`Next in ${nd}d`;
+    const stClass = nd!==null?getStatus(nd):"future";
+
+    let dlRows = DL.map(({key,label}) => {
+      if (!conf[key]) return "";
+      const days = getDays(conf[key]);
+      return `<div class="deadline-row">
+        <span class="deadline-label">${label}</span>
+        <span class="deadline-date">${fmtDate(conf[key])}</span>
+        ${badgeHtml(days)}
+      </div>`;
+    }).join("");
+
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="card-header" onclick="toggleCard('${conf.id}')">
+        <div style="flex:1;min-width:0">
+          <div class="card-title">
+            <strong>${conf.name}</strong>
+            ${nd!==null?`<span class="badge badge-${stClass}">${st}</span>`:""}
+          </div>
+          ${conf.location?`<div class="card-loc">${conf.location}</div>`:""}
+        </div>
+        <div class="card-actions">
+          ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
+          <button onclick="event.stopPropagation();openModal('${conf.id}')">Edit</button>
+          <button class="btn-danger" onclick="event.stopPropagation();delConf('${conf.id}')">Delete</button>
+          <span id="arrow-${conf.id}" style="font-size:13px;color:#999;margin-left:2px">▼</span>
+        </div>
+      </div>
+      <div class="card-body" id="body-${conf.id}">${dlRows}</div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function toggleCard(id) {
+  const body = document.getElementById("body-"+id);
+  const arrow = document.getElementById("arrow-"+id);
+  const open = body.classList.toggle("open");
+  arrow.textContent = open?"▲":"▼";
+}
+
+function openModal(id) {
+  editingId = id||null;
+  const conf = id ? confs.find(c=>c.id===id) : null;
+  document.getElementById("modal-title").textContent = conf?"Edit conference":"Add conference";
+  document.getElementById("f-name").value = conf?.name||"";
+  document.getElementById("f-location").value = conf?.location||"";
+  document.getElementById("f-website").value = conf?.website||"";
+  DL.forEach(({key}) => { document.getElementById("f-"+key).value = conf?.[key]||""; });
+  document.getElementById("modal").classList.add("open");
+}
+
+function closeModal() { document.getElementById("modal").classList.remove("open"); }
+
+function saveConf() {
+  const name = document.getElementById("f-name").value.trim();
+  if (!name) return;
+  const form = { name, location:document.getElementById("f-location").value, website:document.getElementById("f-website").value };
+  DL.forEach(({key}) => { form[key] = document.getElementById("f-"+key).value; });
+  if (editingId) {
+    confs = confs.map(c => c.id===editingId ? {...form, id:editingId} : c);
+  } else {
+    confs.push({...form, id:"c"+Date.now()});
+  }
+  closeModal(); render(); pushData();
+}
+
+function delConf(id) {
+  if (!confirm("Delete this conference?")) return;
+  confs = confs.filter(c=>c.id!==id);
+  render(); pushData();
+}
+
+loadData();
+</script>
+</body>
+</html>
