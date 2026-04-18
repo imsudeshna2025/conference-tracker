@@ -330,7 +330,7 @@ function render() {
     const paperCounts={planned:0,submitted:0,accepted:0,rejected:0};
     papers.forEach(p=>{ if(paperCounts[p.status]!==undefined) paperCounts[p.status]++; });
     const countBadges=Object.entries(paperCounts).filter(([,v])=>v>0)
-      .map(([k,v])=>`<span class="badge badge-${k}" style="font-size:10px;padding:1px 6px">${v} paper${v>1?"s":""} ${k}</span>`).join("");
+      .map(([k,v])=>`<span class="badge badge-${k}">${v} paper${v>1?"s":""} ${k}</span>`).join("");
 
     // Timeline tab content
     let dlRows=DL.map(({key,label})=>{
