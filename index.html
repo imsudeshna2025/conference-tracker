@@ -324,13 +324,13 @@ function render() {
     const nd=getNext(conf);
     const scKey=nd!==null?getStatus(nd):"future";
     const st=nd===null?"":nd===0?"Deadline today":nd<0?"All passed":`Next in ${nd}d`;
-    const papers=Array.isArray(conf.papers)?conf.papers:[];
+    const papers=conf.papers||[];
 
     // Paper counts
     const paperCounts={planned:0,submitted:0,accepted:0,rejected:0};
     papers.forEach(p=>{ if(paperCounts[p.status]!==undefined) paperCounts[p.status]++; });
     const countBadges=Object.entries(paperCounts).filter(([,v])=>v>0)
-      .map(([k,v])=>`<span class="badge badge-${k}">${v} paper${v>1?"s":""} ${k}</span>`).join("");
+      .map(([k,v])=>`<span class="badge badge-${k}" style="font-size:10px;padding:1px 6px">${v} paper${v>1?"s":""} ${k}</span>`).join("");
 
     // Timeline tab content
     let dlRows=DL.map(({key,label})=>{
@@ -371,7 +371,9 @@ function render() {
           <div class="card-title">
             <strong>${conf.name}</strong>
             ${nd!==null?`<span class="badge badge-${scKey}">${st}</span>`:""}
-            ${countBadges}
+          </div>
+          ${conf.location?`<div class="card-loc">${conf.location}</div>`:""}
+          ${countBadges?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">${countBadges}</div>`:""}
         </div>
         <div class="card-actions">
           ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
