@@ -5,62 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Conference Tracker</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:1.5rem 1rem}
-  .wrap{max-width:680px;margin:0 auto}
-  input,select{width:100%;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;font-size:14px;background:#fff;outline:none}
-  input:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
-  button{cursor:pointer;padding:6px 14px;border:0.5px solid #ccc;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a}
-  button:hover{background:#f0f0ee}
-  .btn-primary{background:#e6f1fb;color:#185fa5;border-color:#85b7eb;font-weight:500}
-  .btn-primary:hover{background:#d0e6f7}
-  .btn-danger{color:#a32d2d;border-color:#f09595}
-  .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
-  .header-left h1{font-size:20px;font-weight:500}
-  .header-left p{font-size:13px;color:#666;margin-top:3px}
-  .header-right{display:flex;gap:8px}
-  .badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;display:inline-block}
-  .badge-synced{background:#eaf3de;color:#3b6d11;border:0.5px solid #97c459}
-  .badge-saving{background:#faeeda;color:#854f0b;border:0.5px solid #ef9f27}
-  .badge-error{background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
-  .badge-urgent{background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595}
-  .badge-upcoming{background:#e6f1fb;color:#185fa5;border:0.5px solid #85b7eb}
-  .badge-future{background:#eaf3de;color:#3b6d11;border:0.5px solid #97c459}
-  .badge-passed{background:#f1efe8;color:#5f5e5a;border:0.5px solid #d3d1c7}
-  .badge-today{background:#faeeda;color:#854f0b;border:0.5px solid #ef9f27}
-  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
-  .stat{border-radius:8px;padding:10px 14px}
-  .stat label{font-size:12px;display:block;margin-bottom:4px}
-  .stat span{font-size:22px;font-weight:500;display:block}
-  .filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
-  .filters button{font-size:12px;padding:4px 12px}
-  .filters button.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
-  .card{background:#fff;border:0.5px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:12px}
-  .card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
-  .card-header:hover{background:#fafaf8}
-  .card-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .card-title strong{font-size:15px;font-weight:500}
-  .card-loc{font-size:13px;color:#666;margin-top:2px}
-  .card-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
-  .card-actions a{font-size:12px;color:#185fa5;text-decoration:none;padding:3px 8px;border:0.5px solid #85b7eb;border-radius:6px}
-  .card-body{border-top:0.5px solid #eee;padding:12px 16px;display:none}
-  .card-body.open{display:grid;gap:8px}
-  .deadline-row{display:flex;align-items:center;gap:10px}
-  .deadline-label{font-size:13px;color:#666;width:155px;flex-shrink:0}
-  .deadline-date{font-size:13px;font-weight:500;flex:1}
-  .empty{text-align:center;padding:3rem 1rem;color:#888}
-  .empty .icon{font-size:32px;margin-bottom:12px}
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;z-index:100}
-  .modal-overlay.open{display:flex}
-  .modal{background:#fff;border-radius:16px;border:0.5px solid #ddd;padding:1.5rem;width:480px;max-width:95vw;max-height:90vh;overflow-y:auto}
-  .modal h2{font-size:17px;font-weight:500;margin-bottom:1rem}
-  .field-group{display:grid;gap:10px;margin-bottom:16px}
-  .dl-group{display:grid;gap:8px;margin-bottom:20px}
-  .dl-row{display:flex;align-items:center;gap:10px}
-  .dl-row label{font-size:13px;color:#666;width:150px;flex-shrink:0}
-  .dl-row input{flex:1;width:auto}
-  .modal-footer{display:flex;gap:8px;justify-content:flex-end}
-  .error-box{padding:12px 16px;border-radius:8px;background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595;font-size:13px;margin-bottom:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh;padding:1.5rem 1rem}
+.wrap{max-width:720px;margin:0 auto}
+input,select,textarea{width:100%;padding:8px 10px;border:0.5px solid #ccc;border-radius:8px;font-size:14px;background:#fff;outline:none}
+input:focus,select:focus,textarea:focus{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+button{cursor:pointer;padding:6px 14px;border:0.5px solid #ccc;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a}
+button:hover{background:#f0f0ee}
+.btn-primary{background:#e6f1fb;color:#185fa5;border-color:#85b7eb;font-weight:500}
+.btn-primary:hover{background:#d0e6f7}
+.btn-danger{color:#a32d2d;border-color:#f09595}
+.btn-sm{padding:3px 8px;font-size:12px}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+.header-left h1{font-size:20px;font-weight:500}
+.header-left p{font-size:13px;color:#666;margin-top:3px;display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;display:inline-block;border:0.5px solid}
+.badge-synced{background:#eaf3de;color:#3b6d11;border-color:#97c459}
+.badge-saving{background:#faeeda;color:#854f0b;border-color:#ef9f27}
+.badge-error{background:#fcebeb;color:#a32d2d;border-color:#f09595}
+.badge-urgent{background:#fcebeb;color:#a32d2d;border-color:#f09595}
+.badge-upcoming{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+.badge-future{background:#eaf3de;color:#3b6d11;border-color:#97c459}
+.badge-passed{background:#f1efe8;color:#5f5e5a;border-color:#d3d1c7}
+.badge-today{background:#faeeda;color:#854f0b;border-color:#ef9f27}
+.badge-planned{background:#f1efe8;color:#5f5e5a;border-color:#d3d1c7}
+.badge-submitted{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+.badge-accepted{background:#eaf3de;color:#3b6d11;border-color:#97c459}
+.badge-rejected{background:#fcebeb;color:#a32d2d;border-color:#f09595}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem}
+.stat{border-radius:8px;padding:10px 14px}
+.stat label{font-size:12px;display:block;margin-bottom:4px}
+.stat span{font-size:22px;font-weight:500;display:block}
+.filters{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.filters button{font-size:12px;padding:4px 12px}
+.filters button.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+.card{background:#fff;border:0.5px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:12px}
+.card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.card-header:hover{background:#fafaf8}
+.card-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-title strong{font-size:15px;font-weight:500}
+.card-loc{font-size:13px;color:#666;margin-top:2px}
+.card-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.card-actions a{font-size:12px;color:#185fa5;text-decoration:none;padding:3px 8px;border:0.5px solid #85b7eb;border-radius:6px}
+.card-body{display:none}
+.card-body.open{display:block}
+.tabs{display:flex;border-bottom:0.5px solid #eee;background:#fafaf8}
+.tab{padding:9px 18px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#666;font-weight:500}
+.tab.active{color:#185fa5;border-bottom-color:#185fa5}
+.tab-content{display:none;padding:14px 16px}
+.tab-content.active{display:block}
+.deadline-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.deadline-label{font-size:13px;color:#666;width:155px;flex-shrink:0}
+.deadline-date{font-size:13px;font-weight:500;flex:1}
+.paper-card{border:0.5px solid #eee;border-radius:8px;padding:10px 12px;margin-bottom:8px;background:#fafaf8}
+.paper-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.paper-title{font-size:14px;font-weight:500;flex:1}
+.paper-meta{display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap}
+.teammate-tag{font-size:11px;background:#f0f0ee;border:0.5px solid #ddd;border-radius:20px;padding:2px 8px;color:#444;display:inline-flex;align-items:center;gap:4px}
+.teammate-tag a{color:#185fa5;text-decoration:none;font-size:10px}
+.paper-actions{display:flex;gap:4px;flex-shrink:0}
+.empty-papers{text-align:center;padding:1.5rem;color:#888;font-size:13px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);align-items:center;justify-content:center;z-index:100}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:16px;border:0.5px solid #ddd;padding:1.5rem;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:17px;font-weight:500;margin-bottom:1rem}
+.field-group{display:grid;gap:10px;margin-bottom:16px}
+.dl-group{display:grid;gap:8px;margin-bottom:20px}
+.dl-row{display:flex;align-items:center;gap:10px}
+.dl-row label{font-size:13px;color:#666;width:150px;flex-shrink:0}
+.dl-row input{flex:1;width:auto}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end}
+.error-box{padding:12px 16px;border-radius:8px;background:#fcebeb;color:#a32d2d;border:0.5px solid #f09595;font-size:13px;margin-bottom:16px}
+.email-chip-wrap{display:flex;flex-wrap:wrap;gap:6px;padding:6px 8px;border:0.5px solid #ccc;border-radius:8px;background:#fff;min-height:38px;cursor:text}
+.email-chip-wrap:focus-within{border-color:#378add;box-shadow:0 0 0 2px rgba(55,138,221,0.15)}
+.email-chip{background:#e6f1fb;color:#185fa5;border:0.5px solid #85b7eb;border-radius:20px;padding:2px 8px;font-size:12px;display:flex;align-items:center;gap:4px}
+.email-chip button{border:none;background:none;padding:0;font-size:12px;color:#185fa5;cursor:pointer;line-height:1}
+.email-chip-input{border:none;outline:none;font-size:13px;min-width:180px;flex:1;padding:2px 4px}
+.section-label{font-size:12px;color:#666;font-weight:500;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -70,9 +91,9 @@
       <h1>Conference tracker</h1>
       <p><span id="conf-count">0</span> conferences tracked &nbsp;<span id="sync-badge" class="badge badge-synced">● Synced</span></p>
     </div>
-    <div class="header-right">
+    <div style="display:flex;gap:8px">
       <button onclick="loadData()">↻ Refresh</button>
-      <button class="btn-primary" onclick="openModal()">+ Add conference</button>
+      <button class="btn-primary" onclick="openConfModal()">+ Add conference</button>
     </div>
   </div>
 
@@ -82,36 +103,67 @@
     <div class="stat" style="background:#e6f1fb"><label style="color:#185fa5">Active</label><span id="s-active" style="color:#185fa5">0</span></div>
     <div class="stat" id="s-urgent-card" style="background:#f0f0ee"><label id="s-urgent-label" style="color:#666">Urgent (≤7d)</label><span id="s-urgent" style="color:#666">0</span></div>
   </div>
-
   <div class="filters" id="filters" style="display:none">
     <button class="active" onclick="setFilter('all',this)">All</button>
     <button onclick="setFilter('active',this)">Active</button>
     <button onclick="setFilter('urgent',this)">Urgent</button>
     <button onclick="setFilter('passed',this)">Passed</button>
   </div>
-
   <div id="conf-list"></div>
-  <div id="empty" class="empty" style="display:none">
-    <div class="icon">📋</div>
+  <div id="empty" class="empty-papers" style="display:none;padding:3rem 1rem">
+    <div style="font-size:32px;margin-bottom:12px">📋</div>
     <div style="font-weight:500;margin-bottom:6px">No conferences yet</div>
-    <div style="font-size:14px">Add your first conference to start tracking deadlines.</div>
+    <div>Add your first conference to start tracking deadlines.</div>
   </div>
 </div>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+<!-- Conference Modal -->
+<div class="modal-overlay" id="conf-modal" onclick="if(event.target===this)closeConfModal()">
   <div class="modal">
-    <h2 id="modal-title">Add conference</h2>
+    <h2 id="conf-modal-title">Add conference</h2>
     <div class="field-group">
       <input id="f-name" type="text" placeholder="Conference name"/>
       <input id="f-location" type="text" placeholder="Location (city, country)"/>
       <input id="f-website" type="url" placeholder="Website URL"/>
     </div>
-    <p style="font-size:13px;color:#666;margin-bottom:8px">Deadlines</p>
+    <p class="section-label">Deadlines</p>
     <div class="dl-group" id="dl-fields"></div>
     <div class="modal-footer">
-      <button onclick="closeModal()">Cancel</button>
+      <button onclick="closeConfModal()">Cancel</button>
       <button class="btn-primary" onclick="saveConf()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Paper Modal -->
+<div class="modal-overlay" id="paper-modal" onclick="if(event.target===this)closePaperModal()">
+  <div class="modal">
+    <h2 id="paper-modal-title">Add paper</h2>
+    <div class="field-group">
+      <div>
+        <p class="section-label">Paper title</p>
+        <input id="p-title" type="text" placeholder="Enter paper title"/>
+      </div>
+      <div>
+        <p class="section-label">Status</p>
+        <select id="p-status">
+          <option value="planned">Planned</option>
+          <option value="submitted">Submitted</option>
+          <option value="accepted">Accepted</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div>
+        <p class="section-label">Tag teammates (email addresses)</p>
+        <div class="email-chip-wrap" id="chip-wrap" onclick="document.getElementById('chip-input').focus()">
+          <input class="email-chip-input" id="chip-input" type="email" placeholder="Type email and press Enter or comma"/>
+        </div>
+        <p style="font-size:11px;color:#888;margin-top:4px">Press Enter or comma to add each email</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closePaperModal()">Cancel</button>
+      <button class="btn-primary" onclick="savePaper()">Save & notify</button>
     </div>
   </div>
 </div>
@@ -127,134 +179,157 @@ const DL = [
   {key:"conference",label:"Conference"},
 ];
 
-let confs = [], editingId = null, currentFilter = "all";
+let confs = [], currentFilter = "all", editingConfId = null, editingPaper = null, activePaperConfId = null;
+let chipEmails = [];
 
-// Build deadline fields in modal
+// Build deadline fields
 const dlGroup = document.getElementById("dl-fields");
 DL.forEach(({key,label}) => {
   dlGroup.innerHTML += `<div class="dl-row"><label>${label}</label><input type="date" id="f-${key}"/></div>`;
 });
 
+// Chip input logic
+document.getElementById("chip-input").addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addChip(); }
+  if (e.key === "Backspace" && e.target.value === "" && chipEmails.length) removeChip(chipEmails.length-1);
+});
+document.getElementById("chip-input").addEventListener("blur", addChip);
+
+function addChip() {
+  const val = document.getElementById("chip-input").value.trim().replace(/,$/,"");
+  if (val && val.includes("@") && !chipEmails.includes(val)) {
+    chipEmails.push(val);
+    renderChips();
+  }
+  document.getElementById("chip-input").value = "";
+}
+
+function removeChip(i) {
+  chipEmails.splice(i,1);
+  renderChips();
+}
+
+function renderChips() {
+  const wrap = document.getElementById("chip-wrap");
+  const inp = document.getElementById("chip-input");
+  wrap.innerHTML = "";
+  chipEmails.forEach((email,i) => {
+    const chip = document.createElement("span");
+    chip.className = "email-chip";
+    chip.innerHTML = `${email}<button onclick="removeChip(${i})" type="button">×</button>`;
+    wrap.appendChild(chip);
+  });
+  wrap.appendChild(inp);
+  inp.focus();
+}
+
+// Helpers
 function getDays(d) {
   if (!d) return null;
-  const t = new Date(); t.setHours(0,0,0,0);
-  const x = new Date(d); x.setHours(0,0,0,0);
+  const t=new Date(); t.setHours(0,0,0,0);
+  const x=new Date(d); x.setHours(0,0,0,0);
   return Math.round((x-t)/86400000);
 }
 function getStatus(d) {
-  if (d===null) return null;
-  if (d<0) return "passed";
-  if (d===0) return "today";
-  if (d<=7) return "urgent";
-  if (d<=30) return "upcoming";
+  if(d===null)return null;
+  if(d<0)return "passed"; if(d===0)return "today";
+  if(d<=7)return "urgent"; if(d<=30)return "upcoming";
   return "future";
 }
-function fmtDate(s) {
-  if (!s) return "";
-  return new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"});
-}
+function fmtDate(s) { return s?new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}):""; }
 function getNext(c) {
-  let m = null;
-  DL.forEach(({key}) => { const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m))m=d; });
+  let m=null;
+  DL.forEach(({key})=>{ const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m))m=d; });
   return m;
 }
 function badgeHtml(days) {
-  if (days===null) return "";
-  const s = getStatus(days);
-  const label = days<0?`${Math.abs(days)}d ago`:days===0?"Today":`${days}d left`;
+  if(days===null)return "";
+  const s=getStatus(days);
+  const label=days<0?`${Math.abs(days)}d ago`:days===0?"Today":`${days}d left`;
   return `<span class="badge badge-${s}">${label}</span>`;
 }
-
 function setSyncStatus(s) {
-  const el = document.getElementById("sync-badge");
-  el.className = "badge " + (s==="synced"?"badge-synced":s==="saving"?"badge-saving":"badge-error");
-  el.textContent = s==="synced"?"● Synced":s==="saving"?"Syncing...":"Sync error";
+  const el=document.getElementById("sync-badge");
+  el.className="badge "+(s==="synced"?"badge-synced":s==="saving"?"badge-saving":"badge-error");
+  el.textContent=s==="synced"?"● Synced":s==="saving"?"Syncing...":"Sync error";
 }
 
+// Firebase
 async function loadData() {
   setSyncStatus("saving");
   try {
-    const r = await fetch(`${FB}/conferences.json`);
-    if (!r.ok) throw new Error(r.status);
-    const data = await r.json();
-    confs = data && typeof data==="object" ? Object.values(data) : [];
+    const r=await fetch(`${FB}/conferences.json`);
+    if(!r.ok) throw new Error(r.status);
+    const data=await r.json();
+    confs=data&&typeof data==="object"?Object.values(data):[];
     setSyncStatus("synced");
     document.getElementById("error-box").style.display="none";
     render();
   } catch(e) {
     setSyncStatus("error");
     document.getElementById("error-box").style.display="block";
-    document.getElementById("error-box").textContent = "Could not connect to Firebase: "+e.message;
+    document.getElementById("error-box").textContent="Could not connect to Firebase: "+e.message;
   }
 }
 
 async function pushData() {
   setSyncStatus("saving");
   try {
-    const obj = {};
-    confs.forEach(c => { obj[c.id]=c; });
-    const r = await fetch(`${FB}/conferences.json`, {
-      method:"PUT", headers:{"Content-Type":"application/json"}, body:JSON.stringify(obj)
-    });
-    if (!r.ok) throw new Error(r.status);
+    const obj={};
+    confs.forEach(c=>{obj[c.id]=c;});
+    const r=await fetch(`${FB}/conferences.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(obj)});
+    if(!r.ok) throw new Error(r.status);
     setSyncStatus("synced");
-  } catch(e) {
-    setSyncStatus("error");
-  }
+  } catch(e){ setSyncStatus("error"); }
 }
 
-function setFilter(f, btn) {
-  currentFilter = f;
+function setFilter(f,btn) {
+  currentFilter=f;
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  render();
+  btn.classList.add("active"); render();
 }
 
 function render() {
-  const sorted = [...confs].sort((a,b) => {
+  const sorted=[...confs].sort((a,b)=>{
     const na=getNext(a),nb=getNext(b);
     if(na===null&&nb===null)return 0;
-    if(na===null)return 1; if(nb===null)return -1;
-    return na-nb;
+    if(na===null)return 1; if(nb===null)return -1; return na-nb;
   });
-  const filtered = currentFilter==="all" ? sorted : sorted.filter(c => {
+  const filtered=currentFilter==="all"?sorted:sorted.filter(c=>{
     const nd=getNext(c);
-    if(currentFilter==="active") return nd!==null&&nd>=0;
-    if(currentFilter==="urgent") return nd!==null&&nd>=0&&nd<=7;
-    if(currentFilter==="passed") return nd===null||nd<0;
+    if(currentFilter==="active")return nd!==null&&nd>=0;
+    if(currentFilter==="urgent")return nd!==null&&nd>=0&&nd<=7;
+    if(currentFilter==="passed")return nd===null||nd<0;
     return true;
   });
 
-  document.getElementById("conf-count").textContent = confs.length;
+  document.getElementById("conf-count").textContent=confs.length;
+  const urgent=confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0&&d<=7;}).length;
+  const active=confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0;}).length;
+  document.getElementById("stats").style.display=confs.length>0?"grid":"none";
+  document.getElementById("s-total").textContent=confs.length;
+  document.getElementById("s-active").textContent=active;
+  document.getElementById("s-urgent").textContent=urgent;
+  const uc=document.getElementById("s-urgent-card");
+  uc.style.background=urgent>0?"#fcebeb":"#f0f0ee";
+  document.getElementById("s-urgent").style.color=urgent>0?"#a32d2d":"#666";
+  document.getElementById("s-urgent-label").style.color=urgent>0?"#a32d2d":"#666";
+  document.getElementById("filters").style.display=confs.length>1?"flex":"none";
 
-  const urgent = confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0&&d<=7;}).length;
-  const active = confs.filter(c=>{const d=getNext(c);return d!==null&&d>=0;}).length;
+  const list=document.getElementById("conf-list");
+  list.innerHTML="";
+  document.getElementById("empty").style.display=filtered.length===0&&confs.length===0?"block":"none";
 
-  const statsEl = document.getElementById("stats");
-  statsEl.style.display = confs.length>0?"grid":"none";
-  document.getElementById("s-total").textContent = confs.length;
-  document.getElementById("s-active").textContent = active;
-  document.getElementById("s-urgent").textContent = urgent;
-  const uc = document.getElementById("s-urgent-card");
-  uc.style.background = urgent>0?"#fcebeb":"#f0f0ee";
-  document.getElementById("s-urgent").style.color = urgent>0?"#a32d2d":"#666";
-  document.getElementById("s-urgent-label").style.color = urgent>0?"#a32d2d":"#666";
+  filtered.forEach(conf=>{
+    const nd=getNext(conf);
+    const scKey=nd!==null?getStatus(nd):"future";
+    const st=nd===null?"":nd===0?"Deadline today":nd<0?"All passed":`Next in ${nd}d`;
+    const papers=conf.papers||[];
 
-  document.getElementById("filters").style.display = confs.length>1?"flex":"none";
-
-  const list = document.getElementById("conf-list");
-  list.innerHTML = "";
-  document.getElementById("empty").style.display = filtered.length===0&&confs.length===0?"block":"none";
-
-  filtered.forEach(conf => {
-    const nd = getNext(conf);
-    const sc = {passed:"#f1efe8",today:"#faeeda",urgent:"#fcebeb",upcoming:"#e6f1fb",future:"#eaf3de"}[nd!==null?getStatus(nd):"future"];
-    const st = nd===null?"":nd===0?"Deadline today":nd<0?"All passed":`Next in ${nd}d`;
-    const stClass = nd!==null?getStatus(nd):"future";
-
-    let dlRows = DL.map(({key,label}) => {
-      if (!conf[key]) return "";
-      const days = getDays(conf[key]);
+    // Timeline tab content
+    let dlRows=DL.map(({key,label})=>{
+      if(!conf[key])return "";
+      const days=getDays(conf[key]);
       return `<div class="deadline-row">
         <span class="deadline-label">${label}</span>
         <span class="deadline-date">${fmtDate(conf[key])}</span>
@@ -262,66 +337,156 @@ function render() {
       </div>`;
     }).join("");
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
+    // Papers tab content
+    let paperRows=papers.length===0
+      ?`<div class="empty-papers">No papers added yet.</div>`
+      :papers.map((p,pi)=>{
+        const teammates=( p.teammates||[]).map(email=>`<span class="teammate-tag">👤 ${email} <a href="mailto:${email}" title="Email">✉</a></span>`).join("");
+        return `<div class="paper-card">
+          <div class="paper-top">
+            <span class="paper-title">${p.title}</span>
+            <div class="paper-actions">
+              <button class="btn-sm" onclick="openPaperModal('${conf.id}',${pi})">Edit</button>
+              <button class="btn-sm btn-danger" onclick="deletePaper('${conf.id}',${pi})">Delete</button>
+            </div>
+          </div>
+          <div class="paper-meta">
+            <span class="badge badge-${p.status}">${p.status.charAt(0).toUpperCase()+p.status.slice(1)}</span>
+            ${teammates}
+          </div>
+        </div>`;
+      }).join("");
+
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
       <div class="card-header" onclick="toggleCard('${conf.id}')">
         <div style="flex:1;min-width:0">
           <div class="card-title">
             <strong>${conf.name}</strong>
-            ${nd!==null?`<span class="badge badge-${stClass}">${st}</span>`:""}
+            ${nd!==null?`<span class="badge badge-${scKey}">${st}</span>`:""}
           </div>
           ${conf.location?`<div class="card-loc">${conf.location}</div>`:""}
         </div>
         <div class="card-actions">
           ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
-          <button onclick="event.stopPropagation();openModal('${conf.id}')">Edit</button>
-          <button class="btn-danger" onclick="event.stopPropagation();delConf('${conf.id}')">Delete</button>
+          <button class="btn-sm" onclick="event.stopPropagation();openConfModal('${conf.id}')">Edit</button>
+          <button class="btn-sm btn-danger" onclick="event.stopPropagation();delConf('${conf.id}')">Delete</button>
           <span id="arrow-${conf.id}" style="font-size:13px;color:#999;margin-left:2px">▼</span>
         </div>
       </div>
-      <div class="card-body" id="body-${conf.id}">${dlRows}</div>
+      <div class="card-body" id="body-${conf.id}">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('${conf.id}','timeline',this)">📅 Timeline</div>
+          <div class="tab" onclick="switchTab('${conf.id}','papers',this)">📄 Papers (${papers.length})</div>
+        </div>
+        <div class="tab-content active" id="tab-timeline-${conf.id}">
+          ${dlRows||`<div class="empty-papers">No deadlines added.</div>`}
+        </div>
+        <div class="tab-content" id="tab-papers-${conf.id}">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+            <button class="btn-primary btn-sm" onclick="openPaperModal('${conf.id}')">+ Add paper</button>
+          </div>
+          ${paperRows}
+        </div>
+      </div>
     `;
     list.appendChild(card);
   });
 }
 
 function toggleCard(id) {
-  const body = document.getElementById("body-"+id);
-  const arrow = document.getElementById("arrow-"+id);
-  const open = body.classList.toggle("open");
-  arrow.textContent = open?"▲":"▼";
+  const body=document.getElementById("body-"+id);
+  const arrow=document.getElementById("arrow-"+id);
+  const open=body.classList.toggle("open");
+  arrow.textContent=open?"▲":"▼";
 }
 
-function openModal(id) {
-  editingId = id||null;
-  const conf = id ? confs.find(c=>c.id===id) : null;
-  document.getElementById("modal-title").textContent = conf?"Edit conference":"Add conference";
-  document.getElementById("f-name").value = conf?.name||"";
-  document.getElementById("f-location").value = conf?.location||"";
-  document.getElementById("f-website").value = conf?.website||"";
-  DL.forEach(({key}) => { document.getElementById("f-"+key).value = conf?.[key]||""; });
-  document.getElementById("modal").classList.add("open");
+function switchTab(confId, tab, btn) {
+  document.querySelectorAll(`#body-${confId} .tab`).forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(`#body-${confId} .tab-content`).forEach(t=>t.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById(`tab-${tab}-${confId}`).classList.add("active");
 }
 
-function closeModal() { document.getElementById("modal").classList.remove("open"); }
-
+// Conference modal
+function openConfModal(id) {
+  editingConfId=id||null;
+  const conf=id?confs.find(c=>c.id===id):null;
+  document.getElementById("conf-modal-title").textContent=conf?"Edit conference":"Add conference";
+  document.getElementById("f-name").value=conf?.name||"";
+  document.getElementById("f-location").value=conf?.location||"";
+  document.getElementById("f-website").value=conf?.website||"";
+  DL.forEach(({key})=>{ document.getElementById("f-"+key).value=conf?.[key]||""; });
+  document.getElementById("conf-modal").classList.add("open");
+}
+function closeConfModal(){ document.getElementById("conf-modal").classList.remove("open"); }
 function saveConf() {
-  const name = document.getElementById("f-name").value.trim();
-  if (!name) return;
-  const form = { name, location:document.getElementById("f-location").value, website:document.getElementById("f-website").value };
-  DL.forEach(({key}) => { form[key] = document.getElementById("f-"+key).value; });
-  if (editingId) {
-    confs = confs.map(c => c.id===editingId ? {...form, id:editingId} : c);
+  const name=document.getElementById("f-name").value.trim();
+  if(!name)return;
+  const form={name,location:document.getElementById("f-location").value,website:document.getElementById("f-website").value};
+  DL.forEach(({key})=>{ form[key]=document.getElementById("f-"+key).value; });
+  if(editingConfId){
+    const old=confs.find(c=>c.id===editingConfId);
+    confs=confs.map(c=>c.id===editingConfId?{...form,id:editingConfId,papers:old.papers||[]}:c);
   } else {
-    confs.push({...form, id:"c"+Date.now()});
+    confs.push({...form,id:"c"+Date.now(),papers:[]});
   }
-  closeModal(); render(); pushData();
+  closeConfModal(); render(); pushData();
+}
+function delConf(id){
+  if(!confirm("Delete this conference?"))return;
+  confs=confs.filter(c=>c.id!==id); render(); pushData();
 }
 
-function delConf(id) {
-  if (!confirm("Delete this conference?")) return;
-  confs = confs.filter(c=>c.id!==id);
+// Paper modal
+function openPaperModal(confId, paperIdx) {
+  activePaperConfId=confId;
+  editingPaper=paperIdx!==undefined?paperIdx:null;
+  const conf=confs.find(c=>c.id===confId);
+  const paper=editingPaper!==null?(conf.papers||[])[editingPaper]:null;
+  document.getElementById("paper-modal-title").textContent=paper?"Edit paper":"Add paper";
+  document.getElementById("p-title").value=paper?.title||"";
+  document.getElementById("p-status").value=paper?.status||"planned";
+  chipEmails=paper?.teammates?[...paper.teammates]:[];
+  renderChips();
+  document.getElementById("paper-modal").classList.add("open");
+}
+function closePaperModal(){ document.getElementById("paper-modal").classList.remove("open"); chipEmails=[]; }
+
+function savePaper() {
+  addChip(); // capture any pending input
+  const title=document.getElementById("p-title").value.trim();
+  if(!title)return;
+  const status=document.getElementById("p-status").value;
+  const teammates=[...chipEmails];
+  const paper={title,status,teammates};
+
+  const conf=confs.find(c=>c.id===activePaperConfId);
+  if(!conf.papers)conf.papers=[];
+
+  const isNew=editingPaper===null;
+  const oldStatus=!isNew?conf.papers[editingPaper].status:null;
+
+  if(isNew){ conf.papers.push(paper); }
+  else { conf.papers[editingPaper]=paper; }
+
+  closePaperModal(); render(); pushData();
+
+  // Send email notifications
+  const statusChanged=isNew||(oldStatus!==status);
+  if(teammates.length>0&&statusChanged){
+    const subject=encodeURIComponent(`[Conference Tracker] Paper "${title}" — ${status.charAt(0).toUpperCase()+status.slice(1)}`);
+    const body=encodeURIComponent(`Hi,\n\nYou have been tagged on the following paper:\n\nTitle: ${title}\nStatus: ${status.charAt(0).toUpperCase()+status.slice(1)}\nConference: ${conf.name}${conf.location?" ("+conf.location+")":""}\n\nView the tracker: https://imsudeshna2025.github.io/conference-tracker\n\nThis is an automated notification from Conference Tracker.`);
+    const mailto=`mailto:${teammates.join(",")}?subject=${subject}&body=${body}`;
+    window.location.href=mailto;
+  }
+}
+
+function deletePaper(confId, idx) {
+  if(!confirm("Delete this paper?"))return;
+  const conf=confs.find(c=>c.id===confId);
+  conf.papers.splice(idx,1);
   render(); pushData();
 }
 
