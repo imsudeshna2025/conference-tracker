@@ -371,9 +371,7 @@ function render() {
           <div class="card-title">
             <strong>${conf.name}</strong>
             ${nd!==null?`<span class="badge badge-${scKey}">${st}</span>`:""}
-          </div>
-          ${conf.location?`<div class="card-loc">${conf.location}</div>`:""}
-          ${countBadges?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">${countBadges}</div>`:""}
+            ${countBadges}
         </div>
         <div class="card-actions">
           ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
