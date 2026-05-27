@@ -171,12 +171,12 @@ button:hover{background:#f0f0ee}
 <script>
 const FB = "https://conference-tracker-be3b6-default-rtdb.asia-southeast1.firebasedatabase.app";
 const DL = [
-  {key:"abstract",label:"Abstract Due"},
-  {key:"submission",label:"Paper Submission"},
-  {key:"rebuttal",label:"Rebuttal"},
-  {key:"notification",label:"Decision Notification"},
-  {key:"camera",label:"Camera-Ready"},
-  {key:"conference",label:"Conference"},
+  {key:"abstract",label:"Abstract Due",short:"Abstract"},
+  {key:"submission",label:"Paper Submission",short:"Paper"},
+  {key:"rebuttal",label:"Rebuttal",short:"Rebuttal"},
+  {key:"notification",label:"Decision Notification",short:"Decision"},
+  {key:"camera",label:"Camera-Ready",short:"Camera-ready"},
+  {key:"conference",label:"Conference",short:"Conference"},
 ];
 
 let confs = [], currentFilter = "all", editingConfId = null, editingPaper = null, activePaperConfId = null;
@@ -244,7 +244,7 @@ function getNext(c) {
 }
 function getNextDeadlineInfo(c) {
   let m=null, lbl="";
-  DL.forEach(({key,label})=>{ const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m)){m=d;lbl=label;} });
+  DL.forEach(({key,short})=>{ const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m)){m=d;lbl=short;} });
   return {days:m, label:lbl};
 }
 function badgeHtml(days) {
@@ -329,7 +329,7 @@ function render() {
     const nd=getNext(conf);
     const {days:nd2, label:ndLabel}=getNextDeadlineInfo(conf);
     const scKey=nd!==null?getStatus(nd):"future";
-    const st=nd===null?"":nd===0?`${ndLabel} today`:nd<0?"All passed":`${ndLabel} in ${nd}d`;
+    const st=nd===null?"":nd===0?`${ndLabel} today`:nd<0?"All passed":`${ndLabel} next in ${nd}d`;
     const papers=Array.isArray(conf.papers)?conf.papers:[];
 
     // Paper counts
