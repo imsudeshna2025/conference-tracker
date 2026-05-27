@@ -40,10 +40,6 @@ button:hover{background:#f0f0ee}
 .filters button{font-size:12px;padding:4px 12px}
 .filters button.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
 .card{background:#fff;border:0.5px solid #ddd;border-radius:12px;overflow:hidden;margin-bottom:12px}
-.card-header{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
-.card-header:hover{background:#fafaf8}
-.card-title{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.card-title strong{font-size:15px;font-weight:500}
 .card-loc{font-size:13px;color:#666;margin-top:2px}
 .card-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .card-actions a{font-size:12px;color:#185fa5;text-decoration:none;padding:3px 8px;border:0.5px solid #85b7eb;border-radius:6px}
@@ -171,134 +167,119 @@ button:hover{background:#f0f0ee}
 <script>
 const FB = "https://conference-tracker-be3b6-default-rtdb.asia-southeast1.firebasedatabase.app";
 const DL = [
-  {key:"abstract",label:"Abstract Due",short:"Abstract"},
-  {key:"submission",label:"Paper Submission",short:"Paper"},
-  {key:"rebuttal",label:"Rebuttal",short:"Rebuttal"},
+  {key:"abstract",  label:"Abstract Due",          short:"Abstract"},
+  {key:"submission",label:"Paper Submission",       short:"Paper"},
+  {key:"rebuttal",  label:"Rebuttal",               short:"Rebuttal"},
   {key:"notification",label:"Decision Notification",short:"Decision"},
-  {key:"camera",label:"Camera-Ready",short:"Camera-ready"},
-  {key:"conference",label:"Conference",short:"Conference"},
+  {key:"camera",    label:"Camera-Ready",           short:"Camera-ready"},
+  {key:"conference",label:"Conference",             short:"Conference"},
 ];
 
-let confs = [], currentFilter = "all", editingConfId = null, editingPaper = null, activePaperConfId = null;
-let chipEmails = [];
+let confs=[], currentFilter="all", editingConfId=null, editingPaper=null, activePaperConfId=null;
+let chipEmails=[];
 
-// Build deadline fields
-const dlGroup = document.getElementById("dl-fields");
-DL.forEach(({key,label}) => {
-  dlGroup.innerHTML += `<div class="dl-row"><label>${label}</label><input type="date" id="f-${key}"/></div>`;
+const dlGroup=document.getElementById("dl-fields");
+DL.forEach(({key,label})=>{
+  dlGroup.innerHTML+=`<div class="dl-row"><label>${label}</label><input type="date" id="f-${key}"/></div>`;
 });
 
-// Chip input logic
-document.getElementById("chip-input").addEventListener("keydown", e => {
-  if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addChip(); }
-  if (e.key === "Backspace" && e.target.value === "" && chipEmails.length) removeChip(chipEmails.length-1);
+document.getElementById("chip-input").addEventListener("keydown",e=>{
+  if(e.key==="Enter"||e.key===","){e.preventDefault();addChip();}
+  if(e.key==="Backspace"&&e.target.value===""&&chipEmails.length)removeChip(chipEmails.length-1);
 });
-document.getElementById("chip-input").addEventListener("blur", addChip);
+document.getElementById("chip-input").addEventListener("blur",addChip);
 
-function addChip() {
-  const val = document.getElementById("chip-input").value.trim().replace(/,$/,"");
-  if (val && val.includes("@") && !chipEmails.includes(val)) {
-    chipEmails.push(val);
-    renderChips();
-  }
-  document.getElementById("chip-input").value = "";
+function addChip(){
+  const val=document.getElementById("chip-input").value.trim().replace(/,$/,"");
+  if(val&&val.includes("@")&&!chipEmails.includes(val)){chipEmails.push(val);renderChips();}
+  document.getElementById("chip-input").value="";
 }
-
-function removeChip(i) {
-  chipEmails.splice(i,1);
-  renderChips();
-}
-
-function renderChips() {
-  const wrap = document.getElementById("chip-wrap");
-  const inp = document.getElementById("chip-input");
-  wrap.innerHTML = "";
-  chipEmails.forEach((email,i) => {
-    const chip = document.createElement("span");
-    chip.className = "email-chip";
-    chip.innerHTML = `${email}<button onclick="removeChip(${i})" type="button">×</button>`;
+function removeChip(i){chipEmails.splice(i,1);renderChips();}
+function renderChips(){
+  const wrap=document.getElementById("chip-wrap");
+  const inp=document.getElementById("chip-input");
+  wrap.innerHTML="";
+  chipEmails.forEach((email,i)=>{
+    const chip=document.createElement("span");
+    chip.className="email-chip";
+    chip.innerHTML=`${email}<button onclick="removeChip(${i})" type="button">×</button>`;
     wrap.appendChild(chip);
   });
-  wrap.appendChild(inp);
-  inp.focus();
+  wrap.appendChild(inp); inp.focus();
 }
 
-// Helpers
-function getDays(d) {
-  if (!d) return null;
-  const t=new Date(); t.setHours(0,0,0,0);
-  const x=new Date(d); x.setHours(0,0,0,0);
+function getDays(d){
+  if(!d)return null;
+  const t=new Date();t.setHours(0,0,0,0);
+  const x=new Date(d);x.setHours(0,0,0,0);
   return Math.round((x-t)/86400000);
 }
-function getStatus(d) {
+function getStatus(d){
   if(d===null)return null;
-  if(d<0)return "passed"; if(d===0)return "today";
-  if(d<=7)return "urgent"; if(d<=30)return "upcoming";
+  if(d<0)return "passed";if(d===0)return "today";
+  if(d<=7)return "urgent";if(d<=30)return "upcoming";
   return "future";
 }
-function fmtDate(s) { return s?new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}):""; }
-function getNext(c) {
+function fmtDate(s){return s?new Date(s).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}):"";}
+function getNext(c){
   let m=null;
-  DL.forEach(({key})=>{ const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m))m=d; });
+  DL.forEach(({key})=>{const d=getDays(c[key]);if(d!==null&&d>=0&&(m===null||d<m))m=d;});
   return m;
 }
-function getNextDeadlineInfo(c) {
-  let m=null, lbl="";
-  DL.forEach(({key,short})=>{ const d=getDays(c[key]); if(d!==null&&d>=0&&(m===null||d<m)){m=d;lbl=short;} });
-  return {days:m, label:lbl};
+function getNextInfo(c){
+  let m=null,sh="";
+  DL.forEach(({key,short})=>{const d=getDays(c[key]);if(d!==null&&d>=0&&(m===null||d<m)){m=d;sh=short;}});
+  return {days:m,short:sh};
 }
-function badgeHtml(days) {
+function badgeHtml(days){
   if(days===null)return "";
   const s=getStatus(days);
   const label=days<0?`${Math.abs(days)}d ago`:days===0?"Today":`${days}d left`;
   return `<span class="badge badge-${s}">${label}</span>`;
 }
-function setSyncStatus(s) {
+function setSyncStatus(s){
   const el=document.getElementById("sync-badge");
   el.className="badge "+(s==="synced"?"badge-synced":s==="saving"?"badge-saving":"badge-error");
   el.textContent=s==="synced"?"● Synced":s==="saving"?"Syncing...":"Sync error";
 }
 
-// Firebase
-async function loadData() {
+async function loadData(){
   setSyncStatus("saving");
-  try {
+  try{
     const r=await fetch(`${FB}/conferences.json`);
-    if(!r.ok) throw new Error(r.status);
+    if(!r.ok)throw new Error(r.status);
     const data=await r.json();
     confs=data&&typeof data==="object"?Object.values(data):[];
     setSyncStatus("synced");
     document.getElementById("error-box").style.display="none";
     render();
-  } catch(e) {
+  }catch(e){
     setSyncStatus("error");
     document.getElementById("error-box").style.display="block";
     document.getElementById("error-box").textContent="Could not connect to Firebase: "+e.message;
   }
 }
-
-async function pushData() {
+async function pushData(){
   setSyncStatus("saving");
-  try {
-    const obj={};
-    confs.forEach(c=>{obj[c.id]=c;});
+  try{
+    const obj={};confs.forEach(c=>{obj[c.id]=c;});
     const r=await fetch(`${FB}/conferences.json`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(obj)});
-    if(!r.ok) throw new Error(r.status);
+    if(!r.ok)throw new Error(r.status);
     setSyncStatus("synced");
-  } catch(e){ setSyncStatus("error"); }
+  }catch(e){setSyncStatus("error");}
 }
 
-function setFilter(f,btn) {
+function setFilter(f,btn){
   currentFilter=f;
   document.querySelectorAll(".filters button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active"); render();
+  btn.classList.add("active");render();
 }
 
-function render() {
+function render(){
   const sorted=[...confs].sort((a,b)=>{
     const na=getNext(a),nb=getNext(b);
     if(na===null&&nb===null)return 0;
-    if(na===null)return 1; if(nb===null)return -1; return na-nb;
+    if(na===null)return 1;if(nb===null)return -1;return na-nb;
   });
   const filtered=currentFilter==="all"?sorted:sorted.filter(c=>{
     const nd=getNext(c);
@@ -326,19 +307,16 @@ function render() {
   document.getElementById("empty").style.display=filtered.length===0&&confs.length===0?"block":"none";
 
   filtered.forEach(conf=>{
-    const nd=getNext(conf);
-    const {days:nd2, label:ndLabel}=getNextDeadlineInfo(conf);
+    const {days:nd,short:ndShort}=getNextInfo(conf);
     const scKey=nd!==null?getStatus(nd):"future";
-    const st=nd===null?"":nd===0?`${ndLabel} today`:nd<0?"All passed":`${ndLabel} next in ${nd}d`;
-    const papers=Array.isArray(conf.papers)?conf.papers:[];
+    const st=nd===null?"":nd===0?`${ndShort} today`:nd<0?"All passed":`${ndShort} next in ${nd}d`;
 
-    // Paper counts
+    const papers=Array.isArray(conf.papers)?conf.papers:[];
     const paperCounts={planned:0,submitted:0,accepted:0,rejected:0};
-    papers.forEach(p=>{ if(paperCounts[p.status]!==undefined) paperCounts[p.status]++; });
+    papers.forEach(p=>{if(paperCounts[p.status]!==undefined)paperCounts[p.status]++;});
     const countBadges=Object.entries(paperCounts).filter(([,v])=>v>0)
       .map(([k,v])=>`<span class="badge badge-${k}">${v} paper${v>1?"s":""} ${k}</span>`).join("");
 
-    // Timeline tab content
     let dlRows=DL.map(({key,label})=>{
       if(!conf[key])return "";
       const days=getDays(conf[key]);
@@ -349,11 +327,10 @@ function render() {
       </div>`;
     }).join("");
 
-    // Papers tab content
     let paperRows=papers.length===0
       ?`<div class="empty-papers">No papers added yet.</div>`
       :papers.map((p,pi)=>{
-        const teammates=( p.teammates||[]).map(email=>`<span class="teammate-tag">👤 ${email} <a href="mailto:${email}" title="Email">✉</a></span>`).join("");
+        const teammates=(p.teammates||[]).map(email=>`<span class="teammate-tag">👤 ${email} <a href="mailto:${email}" title="Email">✉</a></span>`).join("");
         return `<div class="paper-card">
           <div class="paper-top">
             <span class="paper-title">${p.title}</span>
@@ -372,18 +349,22 @@ function render() {
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML=`
-      <div class="card-header" onclick="toggleCard('${conf.id}')">
-        <div style="flex:1;min-width:0">
-          <div class="card-title">
-            <strong>${conf.name}</strong>
+      <div onclick="toggleCard('${conf.id}')" style="padding:14px 16px;cursor:pointer">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0">
+            <strong style="font-size:15px;font-weight:500">${conf.name}</strong>
             ${nd!==null?`<span class="badge badge-${scKey}">${st}</span>`:""}
-            ${countBadges}
+          </div>
+          <div class="card-actions" style="flex-shrink:0">
+            ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
+            <button class="btn-sm" onclick="event.stopPropagation();openConfModal('${conf.id}')">Edit</button>
+            <button class="btn-sm btn-danger" onclick="event.stopPropagation();delConf('${conf.id}')">Delete</button>
+            <span id="arrow-${conf.id}" style="font-size:13px;color:#999;margin-left:2px">▼</span>
+          </div>
         </div>
-        <div class="card-actions">
-          ${conf.website?`<a href="${conf.website}" onclick="event.stopPropagation()" target="_blank" rel="noreferrer">Site</a>`:""}
-          <button class="btn-sm" onclick="event.stopPropagation();openConfModal('${conf.id}')">Edit</button>
-          <button class="btn-sm btn-danger" onclick="event.stopPropagation();delConf('${conf.id}')">Delete</button>
-          <span id="arrow-${conf.id}" style="font-size:13px;color:#999;margin-left:2px">▼</span>
+        ${conf.location?`<div class="card-loc">${conf.location}</div>`:""}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">
+          ${countBadges||`<span class="badge" style="background:#fff8e6;color:#a06000;border:0.5px solid #f0c060">no papers planned</span>`}
         </div>
       </div>
       <div class="card-body" id="body-${conf.id}">
@@ -400,58 +381,54 @@ function render() {
           </div>
           ${paperRows}
         </div>
-      </div>
-    `;
+      </div>`;
     list.appendChild(card);
   });
 }
 
-function toggleCard(id) {
+function toggleCard(id){
   const body=document.getElementById("body-"+id);
   const arrow=document.getElementById("arrow-"+id);
   const open=body.classList.toggle("open");
   arrow.textContent=open?"▲":"▼";
 }
-
-function switchTab(confId, tab, btn) {
+function switchTab(confId,tab,btn){
   document.querySelectorAll(`#body-${confId} .tab`).forEach(t=>t.classList.remove("active"));
   document.querySelectorAll(`#body-${confId} .tab-content`).forEach(t=>t.classList.remove("active"));
   btn.classList.add("active");
   document.getElementById(`tab-${tab}-${confId}`).classList.add("active");
 }
 
-// Conference modal
-function openConfModal(id) {
+function openConfModal(id){
   editingConfId=id||null;
   const conf=id?confs.find(c=>c.id===id):null;
   document.getElementById("conf-modal-title").textContent=conf?"Edit conference":"Add conference";
   document.getElementById("f-name").value=conf?.name||"";
   document.getElementById("f-location").value=conf?.location||"";
   document.getElementById("f-website").value=conf?.website||"";
-  DL.forEach(({key})=>{ document.getElementById("f-"+key).value=conf?.[key]||""; });
+  DL.forEach(({key})=>{document.getElementById("f-"+key).value=conf?.[key]||"";});
   document.getElementById("conf-modal").classList.add("open");
 }
-function closeConfModal(){ document.getElementById("conf-modal").classList.remove("open"); }
-function saveConf() {
+function closeConfModal(){document.getElementById("conf-modal").classList.remove("open");}
+function saveConf(){
   const name=document.getElementById("f-name").value.trim();
   if(!name)return;
   const form={name,location:document.getElementById("f-location").value,website:document.getElementById("f-website").value};
-  DL.forEach(({key})=>{ form[key]=document.getElementById("f-"+key).value; });
+  DL.forEach(({key})=>{form[key]=document.getElementById("f-"+key).value;});
   if(editingConfId){
     const old=confs.find(c=>c.id===editingConfId);
     confs=confs.map(c=>c.id===editingConfId?{...form,id:editingConfId,papers:old.papers||[]}:c);
-  } else {
+  }else{
     confs.push({...form,id:"c"+Date.now(),papers:[]});
   }
-  closeConfModal(); render(); pushData();
+  closeConfModal();render();pushData();
 }
 function delConf(id){
   if(!confirm("Delete this conference?"))return;
-  confs=confs.filter(c=>c.id!==id); render(); pushData();
+  confs=confs.filter(c=>c.id!==id);render();pushData();
 }
 
-// Paper modal
-function openPaperModal(confId, paperIdx) {
+function openPaperModal(confId,paperIdx){
   activePaperConfId=confId;
   editingPaper=paperIdx!==undefined?paperIdx:null;
   const conf=confs.find(c=>c.id===confId);
@@ -463,42 +440,32 @@ function openPaperModal(confId, paperIdx) {
   renderChips();
   document.getElementById("paper-modal").classList.add("open");
 }
-function closePaperModal(){ document.getElementById("paper-modal").classList.remove("open"); chipEmails=[]; }
-
-function savePaper() {
-  addChip(); // capture any pending input
+function closePaperModal(){document.getElementById("paper-modal").classList.remove("open");chipEmails=[];}
+function savePaper(){
+  addChip();
   const title=document.getElementById("p-title").value.trim();
   if(!title)return;
   const status=document.getElementById("p-status").value;
   const teammates=[...chipEmails];
   const paper={title,status,teammates};
-
   const conf=confs.find(c=>c.id===activePaperConfId);
   if(!conf.papers)conf.papers=[];
-
   const isNew=editingPaper===null;
   const oldStatus=!isNew?conf.papers[editingPaper].status:null;
-
-  if(isNew){ conf.papers.push(paper); }
-  else { conf.papers[editingPaper]=paper; }
-
-  closePaperModal(); render(); pushData();
-
-  // Send email notifications
+  if(isNew){conf.papers.push(paper);}else{conf.papers[editingPaper]=paper;}
+  closePaperModal();render();pushData();
   const statusChanged=isNew||(oldStatus!==status);
   if(teammates.length>0&&statusChanged){
     const subject=encodeURIComponent(`[Conference Tracker] Paper "${title}" — ${status.charAt(0).toUpperCase()+status.slice(1)}`);
     const body=encodeURIComponent(`Hi,\n\nYou have been tagged on the following paper:\n\nTitle: ${title}\nStatus: ${status.charAt(0).toUpperCase()+status.slice(1)}\nConference: ${conf.name}${conf.location?" ("+conf.location+")":""}\n\nView the tracker: https://imsudeshna2025.github.io/conference-tracker\n\nThis is an automated notification from Conference Tracker.`);
-    const mailto=`mailto:${teammates.join(",")}?subject=${subject}&body=${body}`;
-    window.location.href=mailto;
+    window.location.href=`mailto:${teammates.join(",")}?subject=${subject}&body=${body}`;
   }
 }
-
-function deletePaper(confId, idx) {
+function deletePaper(confId,idx){
   if(!confirm("Delete this paper?"))return;
   const conf=confs.find(c=>c.id===confId);
   conf.papers.splice(idx,1);
-  render(); pushData();
+  render();pushData();
 }
 
 loadData();
